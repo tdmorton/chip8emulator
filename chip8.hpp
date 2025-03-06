@@ -13,7 +13,8 @@ class chip8
 	uint16_t index; 	// memory index
 	uint8_t memory[4096]; // memory
 	
-	uint8_t fonts[80]; 
+	bool init();		// initialize emulator
+	
 	
 };
 	
