@@ -46,9 +46,9 @@ bool chip8::init()
 	
 }
 
-bool chip8::loadRom()
+bool chip8::loadRom(char* filename)
 {
-	std::ifstream file("test_opcode.ch8", std::ios::binary);		// grabs rom
+	std::ifstream file(filename, std::ios::binary);		// grabs rom
 	
 	//try
 	//{
@@ -79,7 +79,7 @@ bool chip8::loadRom()
 	return 0;
 }
 
-bool chip8::checkRom()
+bool chip8::checkRom(char* filename)
 {
 	std::ifstream file("test_opcode.ch8", std::ios::binary);		// grabs rom
 	
