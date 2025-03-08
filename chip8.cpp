@@ -132,11 +132,103 @@ bool chip8::emulateOneCycle()
 	
 	switch(opcode & 0xF000)						// bit mask, narrow switch statement to only 0-F
 	{
-		case 0x6000:
+		case 0x4000:													// 0x4XNN
 		{
-			V[(opcode & 0x0F00) >> 8] = (opcode & 0x00FF);
-			std::cout << pc << ": " << std::hex << opcode <<  " | V[5] = " << std::hex << static_cast<int>(V[5]) << std::endl;
+			if (V[(opcode & 0x0F00) >> 8] & (opcode & 0x00FF))			// if VX == NN
+		}
 			break;
+		case 0x5000:													// 0x5XY0
+		{
+			if (V[(opcode & 0x0F00) >> 8] & V[(opcode & 0x00F0) >> 4])	// if VX == VY
+			{
+				pc += 2;												// skip next instruction
+			}
+			break;
+		}
+		case 0x6000:													// 0x6XNN
+		{
+			V[(opcode & 0x0F00) >> 8] = (opcode & 0x00FF);				// VX = NN
+			break;
+		}
+		case 0x7000:													// 0x7XNN
+		{
+			V[(opcode & 0x0F00) >> 8] += (opcode & 0x00FF);				// VX += NN (no carry flag set)
+			break;
+		}
+		case 0x8000:
+		{
+			switch (opcode & 0x000F)										// 0x8000-0x800E
+			{
+				case 0x0000:												// 0x8XY0
+				{
+					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4];	// VX = VY
+					break;
+				}
+				case 0x0001:												// 0x8XY1
+				{
+					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x0F00) >> 8] | V[(opcode & 0x00F0) >> 4];	// VX |= VY
+					break;
+				}
+				case 0x0002:												// 0x8XY2
+				{
+					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x0F00) >> 8] & V[(opcode & 0x00F0) >> 4];	// VX &= VY
+					break;
+				}				
+				case 0x0003:												// 0x8XY3
+				{
+					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x0F00) >> 8] ^ V[(opcode & 0x00F0) >> 4];	// VX ^= VY
+					break;
+				}
+				case 0x0004:												// 0x8XY4
+				{
+					if ((V[(opcode & 0x0F00) >> 8] + V[(opcode & 0x00F0) >> 4]) > 0xFF)
+					{
+						V[0xF] = 1;
+					}
+					else
+					{
+						V[0xF] = 0;
+					}
+					V[(opcode & 0x0F00) >> 8] += V[(opcode & 0x00F0) >> 4];								// VX += VY carry set
+					break;
+				}
+				case 0x0005:												// 0x8XY5
+				{
+					if (V[(opcode & 0x0F00) >> 8] >= V[(opcode & 0x00F0) >> 4])							// VF = !underflow
+					{
+						V[0xF] = 1;
+					}
+					else
+					{
+						V[0xF] = 0;
+					}
+					V[(opcode & 0x0F00) >> 8] -= V[(opcode & 0x00F0) >> 4];								// VX -= VY carry set
+					break;
+				}
+				case 0x0006:												// 0x8XY6
+				{
+					V[0xF] = (V[(opcode & 0x0F00) >> 8] & 0x0001);										// VF = VX LSB
+					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x0F00) >> 8] >> 1;							// VX >>= 1
+					break;
+				}
+				case 0x0007:												// 0x8XY7
+				{
+					if (V[(opcode & 0x00F0) >> 4] >= V[(opcode & 0x0F00) >> 8])							// VF = !underflow
+					{
+						V[0xF] = 1;
+					}
+					else
+					{
+						V[0xF] = 0;
+					}
+					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4] - V[(opcode & 0x0F00) >> 8];	// VX -= VY carry set
+				case 0x000E:												// 0x8XYE
+				{
+					V[0xF] = (V[(opcode & 0x0F00) >> 8] & 0x8000);										// VF = VX MSB
+					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x0F00) >> 8] << 1;							// VX <<= 1
+					break;
+				}
+			}
 		}
 	}
 	return 0;
