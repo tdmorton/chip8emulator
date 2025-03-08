@@ -14,5 +14,7 @@ int main()
 	
 	std::cout << "Hello World, is chip8 is initialized?: " << weGood << std::endl;
 	
+	std::cout << "0 means rom is good, 1 means rom is bad" << ch8.checkRom() << std::endl;
+	
 	return 0;
 }

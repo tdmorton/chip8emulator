@@ -27,6 +27,7 @@ class chip8
 	bool init();		// initialize emulator
 	
 	bool loadRom();	// loads rom from pc memory
+	bool checkRom(); // checks memory to make sure it matches rom
 	
 };
 	

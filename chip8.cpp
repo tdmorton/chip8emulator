@@ -37,7 +37,7 @@ bool chip8::init()
 		0xF0, 0x80, 0xF0, 0x80, 0x80  //F
 	};
 
-	for (int i = 0x050; i < 0x0A1; ++i)	// fontset is stored from 0x050 to 0x0A0
+	for (int i = 0x050; i < 0x0A0; i++)	// fontset is stored from 0x050 to 0x0A0
 	{
 		memory[i] = fonts[i];
 	}
@@ -57,13 +57,9 @@ bool chip8::loadRom()
 			//throw std::runtime_error("Could not open file");
 		}
 		
-		uint8_t byteHolder;
-		int loader = 0x200;
-		
-		while(file.get(byteHolder))
+		while(memory[pc] = file.get())
 		{
-			memory[loader] = byteHolder;
-			++loader;
+			++pc;
 		}
 		
 		if (file.bad())
@@ -83,3 +79,42 @@ bool chip8::loadRom()
 	return 0;
 }
 
+bool chip8::checkRom()
+{
+	std::ifstream file("test_opcode.ch8", std::ios::binary);		// grabs rom
+	
+	//try
+	//{
+		if (!file.is_open()) 
+		{
+			//throw std::runtime_error("Could not open file");
+		}
+		
+		uint8_t tempRom;
+		pc = 0x200;
+		
+		while(tempRom = file.get())
+		{
+			if (tempRom != memory[pc])
+			{
+				return 1;
+			}
+			++pc;
+		}
+		
+		if (file.bad())
+		{
+		//	throw std::runtime_error("Error occurred during reading file");
+		}
+		
+		file.close();
+	//}
+	//catch(std::ifstream badFile)
+	//{
+		
+	//	return 1;
+		
+	//}
+	
+	return 0;
+}
