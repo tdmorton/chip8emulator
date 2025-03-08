@@ -48,7 +48,7 @@ bool chip8::init()
 
 bool chip8::loadRom(char* filename)
 {
-	std::ifstream file(filename, std::ios::binary);		// grabs rom
+	std::ifstream ifs(filename, std::ios::binary | std::ios::ate);		// grabs rom
 	
 	//try
 	//{
@@ -57,8 +57,19 @@ bool chip8::loadRom(char* filename)
 			//throw std::runtime_error("Could not open file");
 		}
 		
-		while(memory[pc] = file.get())
+		std::ifstream::pos_type pos = ifs.tellg();
+
+		std::vector<char>  result(pos);
+
+		ifs.seekg(0, std::ios::beg);
+		ifs.read(&result[0], pos);
+		
+		uint8_t tempRom;
+		
+		while(tempRom = file.get())
 		{
+			memory[pc] = tempRom;
+			std::cout << std::hex << "Addr: " << pc-0x200 << "  ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
 			++pc;
 		}
 		
@@ -97,6 +108,7 @@ bool chip8::checkRom(char* filename)
 		
 		while(tempRom = file.get())
 		{
+			std::cout << std::hex << "ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
 			if (tempRom != memory[pc])
 			{
 				return 1;
@@ -125,6 +137,7 @@ bool chip8::checkRom(char* filename)
 
 bool chip8::emulateOneCycle()
 {
+	std::cout << "Emulation Cycle: " << std::hex << pc << std::endl;
 	opcode = memory[pc] << 8 | memory[pc+1];	// grab next opcode
 	pc += 2;									// increment pc by 2 (opcodes are 2 bytes)
 	
@@ -132,11 +145,23 @@ bool chip8::emulateOneCycle()
 	
 	switch(opcode & 0xF000)						// bit mask, narrow switch statement to only 0-F
 	{
-		case 0x4000:													// 0x4XNN
+		case 0x3000:													// 0x3XNN
 		{
 			if (V[(opcode & 0x0F00) >> 8] & (opcode & 0x00FF))			// if VX == NN
-		}
+			{
+				pc += 2;												// skip next instruction
+			}
 			break;
+		}
+		case 0x4000:													// 0x4XNN
+		{
+			if (V[(opcode & 0x0F00) >> 8] & (opcode & 0x00FF)){}		// if VX != NN
+			else
+			{
+				pc += 2;												// skip next instruction
+			}
+			break;
+		}
 		case 0x5000:													// 0x5XY0
 		{
 			if (V[(opcode & 0x0F00) >> 8] & V[(opcode & 0x00F0) >> 4])	// if VX == VY
@@ -222,6 +247,8 @@ bool chip8::emulateOneCycle()
 						V[0xF] = 0;
 					}
 					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4] - V[(opcode & 0x0F00) >> 8];	// VX -= VY carry set
+					break;
+				}
 				case 0x000E:												// 0x8XYE
 				{
 					V[0xF] = (V[(opcode & 0x0F00) >> 8] & 0x8000);										// VF = VX MSB

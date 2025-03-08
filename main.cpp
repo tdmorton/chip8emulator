@@ -19,15 +19,18 @@ int main(int argc, char** argv)
 	
 	bool gotAFile = ch8.loadRom(argv[1]);
 	
+	bool memLoadedGood = ch8.checkRom(argv[1]);
+	
 	std::cout << "Hello World, is chip8 is initialized?: " << weGood << std::endl;
 	
-	std::cout << "0 means rom is good, 1 means rom is bad" << ch8.checkRom(argv[1]) << std::endl;
+	std::cout << "0 means rom is good, 1 means rom is bad" <<  memLoadedGood << std::endl;
 	
 	int counter = 0;
 	
-	while (counter < 200)
+	while (counter < 15)
 	{
 		ch8.emulateOneCycle();
+		++counter;
 	}
 	
 	return 0;
