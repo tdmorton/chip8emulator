@@ -76,6 +76,8 @@ bool chip8::loadRom(char* filename)
 		
 	//}
 	
+	pc = 0x200; 			// reset pc
+	
 	return 0;
 }
 
@@ -116,5 +118,29 @@ bool chip8::checkRom(char* filename)
 		
 	//}
 	
+	pc = 0x200;
+	
 	return 0;
 }
+
+bool chip8::emulateOneCycle()
+{
+	opcode = memory[pc] << 8 | memory[pc+1];	// grab next opcode
+	pc += 2;									// increment pc by 2 (opcodes are 2 bytes)
+	
+	// use switch statement, function pointer implementation maybe later
+	
+	switch(opcode & 0xF000)						// bit mask, narrow switch statement to only 0-F
+	{
+		case 0x6000:
+		{
+			V[(opcode & 0x0F00) >> 8] = (opcode & 0x00FF);
+			std::cout << pc << ": " << std::hex << opcode <<  " | V[5] = " << std::hex << static_cast<int>(V[5]) << std::endl;
+			break;
+		}
+	}
+	return 0;
+}
+	
+	
+	

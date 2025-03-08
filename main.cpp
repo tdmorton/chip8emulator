@@ -23,5 +23,12 @@ int main(int argc, char** argv)
 	
 	std::cout << "0 means rom is good, 1 means rom is bad" << ch8.checkRom(argv[1]) << std::endl;
 	
+	int counter = 0;
+	
+	while (counter < 200)
+	{
+		ch8.emulateOneCycle();
+	}
+	
 	return 0;
 }
