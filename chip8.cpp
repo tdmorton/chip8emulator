@@ -48,7 +48,7 @@ bool chip8::init()
 
 bool chip8::loadRom(char* filename)
 {
-	std::ifstream ifs(filename, std::ios::binary | std::ios::ate);		// grabs rom
+	std::ifstream file(filename, std::ios::in | std::ios::binary);		// grabs rom
 	
 	//try
 	//{
@@ -56,13 +56,7 @@ bool chip8::loadRom(char* filename)
 		{
 			//throw std::runtime_error("Could not open file");
 		}
-		
-		std::ifstream::pos_type pos = ifs.tellg();
-
-		std::vector<char>  result(pos);
-
-		ifs.seekg(0, std::ios::beg);
-		ifs.read(&result[0], pos);
+	
 		
 		uint8_t tempRom;
 		
