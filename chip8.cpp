@@ -48,38 +48,26 @@ bool chip8::init()
 
 bool chip8::loadRom(char* filename)
 {
-	std::ifstream file(filename, std::ios::in | std::ios::binary);		// grabs rom
+	std::ifstream file(filename, std::ios::binary);		// grabs rom
 	
 	//try
 	//{
-		if (!file.is_open()) 
+		if (!file) 
 		{
-			//throw std::runtime_error("Could not open file");
+			std::cerr << "Could not open file " << filename << std::endl;
 		}
 	
 		
 		uint8_t tempRom;
 		
-		while(tempRom = file.get())
+		while(file.read(reinterpret_cast<char*>(&tempRom), sizeof(tempRom)))
 		{
 			memory[pc] = tempRom;
 			std::cout << std::hex << "Addr: " << pc-0x200 << "  ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
 			++pc;
 		}
 		
-		if (file.bad())
-		{
-		//	throw std::runtime_error("Error occurred during reading file");
-		}
-		
 		file.close();
-	//}
-	//catch(std::ifstream badFile)
-	//{
-		
-	//	return 1;
-		
-	//}
 	
 	pc = 0x200; 			// reset pc
 	
@@ -88,11 +76,11 @@ bool chip8::loadRom(char* filename)
 
 bool chip8::checkRom(char* filename)
 {
-	std::ifstream file("test_opcode.ch8", std::ios::binary);		// grabs rom
+	std::ifstream file(filename, std::ios::binary);		// grabs rom
 	
 	//try
 	//{
-		if (!file.is_open()) 
+		if (!file) 
 		{
 			//throw std::runtime_error("Could not open file");
 		}
