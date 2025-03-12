@@ -3,6 +3,11 @@
 #include <cstring>
 #include <iostream>
 #include <fstream>
+#include <random>
+
+std::random_device dev;
+std::mt19937 rng(dev());
+std::uniform_int_distribution<std::mt19937::result_type> dist256(0,255);
 
 bool chip8::init()
 {
@@ -151,8 +156,7 @@ bool chip8::emulateOneCycle()
 					break;
 				}
 			}
-		}
-				
+		}	
 		case 0x1000:
 		{
 			break;
@@ -295,8 +299,28 @@ bool chip8::emulateOneCycle()
 		}
 		case 0xC000:
 		{
-			
-		
+			V[(opcode & 0x0F00) >> 8] = static_cast<uint8_t>(dist256(rng) & (opcode & 0x00FF));
+			break;
+		}
+		case 0xD000:
+		{
+			//drawSprite(V[(opcode & 0x0F00) >> 8], V[(opcode & 0x00F0) >> 4], V[(opcode & 0x000F)]);
+			break;
+		}
+		case 0xE000:
+		{
+			switch(opcode & 0x00F0)
+			{
+				case 0x0090:
+				{
+					break;
+				}
+				case 0x00A0:
+				{
+					break;
+				}
+			}
+		}
 		default:
 		{
 			std::cout << "Unknown Opcode: " << std::hex << opcode << std::endl;
