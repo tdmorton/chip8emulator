@@ -6,11 +6,20 @@
 int main(int argc, char** argv)
 {
 	
+	if (argc < 2)
+	{
+		std::cerr << "Please include a name for the ROM to load. Type --help for details." << std::endl;
+		return 1;				// exit main
+	}
+	
 	chip8 ch8;
 	
 	bool weGood = ch8.init();
 	
 	std::cout << argc << std::endl;
+	
+
+	
 	
 	for (int i = 0; i < argc; ++i)
 	{
@@ -20,10 +29,6 @@ int main(int argc, char** argv)
 	bool gotAFile = ch8.loadRom(argv[1]);
 	
 	bool memLoadedGood = ch8.checkRom(argv[1]);
-	
-	std::cout << "Hello World, is chip8 is initialized?: " << weGood << std::endl;
-	
-	std::cout << "0 means rom is good, 1 means rom is bad" <<  memLoadedGood << std::endl;
 	
 	int counter = 0;
 	

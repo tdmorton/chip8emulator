@@ -55,15 +55,15 @@ bool chip8::loadRom(char* filename)
 		if (!file) 
 		{
 			std::cerr << "Could not open file " << filename << std::endl;
+			return 1;
 		}
-	
 		
 		uint8_t tempRom;
 		
 		while(file.read(reinterpret_cast<char*>(&tempRom), sizeof(tempRom)))
 		{
 			memory[pc] = tempRom;
-			std::cout << std::hex << "Addr: " << pc-0x200 << "  ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
+			//std::cout << std::hex << "Addr: " << pc-0x200 << "  ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
 			++pc;
 		}
 		
@@ -82,7 +82,8 @@ bool chip8::checkRom(char* filename)
 	//{
 		if (!file) 
 		{
-			//throw std::runtime_error("Could not open file");
+			std::cerr << "Cannot find file " << filename << std::endl;
+			return 1;//throw std::runtime_error("Could not open file");
 		}
 		
 		uint8_t tempRom;
@@ -90,7 +91,7 @@ bool chip8::checkRom(char* filename)
 		
 		while(tempRom = file.get())
 		{
-			std::cout << std::hex << "ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
+			//std::cout << std::hex << "ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
 			if (tempRom != memory[pc])
 			{
 				return 1;
@@ -119,7 +120,7 @@ bool chip8::checkRom(char* filename)
 
 bool chip8::emulateOneCycle()
 {
-	std::cout << "Emulation Cycle: " << std::hex << pc << std::endl;
+	//std::cout << "Emulation Cycle: " << std::hex << pc << std::endl;
 	opcode = memory[pc] << 8 | memory[pc+1];	// grab next opcode
 	pc += 2;									// increment pc by 2 (opcodes are 2 bytes)
 	
@@ -127,6 +128,39 @@ bool chip8::emulateOneCycle()
 	
 	switch(opcode & 0xF000)						// bit mask, narrow switch statement to only 0-F
 	{
+		case 0x0000:
+		{
+			switch(opcode)
+			{
+				case 0x00E0:
+				{
+					for (int i = 0; i < 64*32; ++i)
+					{
+						screen[i] = 0x00;
+					}
+					drawFlag = true;
+				}
+				case 0x00EE:
+				{
+					--sp;
+					pc = stack[sp];
+				}
+				default:
+				{
+					std::cout << "Unknown Opcode: " << std::hex << opcode << std::endl;
+					break;
+				}
+			}
+		}
+				
+		case 0x1000:
+		{
+			break;
+		}
+		case 0x2000:													// 0x2NNN
+		{
+			break;
+		}
 		case 0x3000:													// 0x3XNN
 		{
 			if (V[(opcode & 0x0F00) >> 8] & (opcode & 0x00FF))			// if VX == NN
@@ -238,6 +272,35 @@ bool chip8::emulateOneCycle()
 					break;
 				}
 			}
+		}
+		case 0x9000:													// 0x9XY0
+		{
+			if (V[(opcode & 0x0F00) >> 8] != V[(opcode & 0x00F0) >> 4])
+			{
+				pc += 2;												// skip next instruction
+			}
+			break;
+		}
+		case 0xA000:
+		{
+			I = (opcode & 0x0FFF) >> 4;
+			break;
+		}
+		case 0xB000:
+		{
+			stack[sp] = pc;
+			++sp;
+			pc = V[0] + ((opcode & 0x0FFF) >> 4);
+			break;
+		}
+		case 0xC000:
+		{
+			
+		
+		default:
+		{
+			std::cout << "Unknown Opcode: " << std::hex << opcode << std::endl;
+			break;
 		}
 	}
 	return 0;
