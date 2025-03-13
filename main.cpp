@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include "chip8.hpp"
+#include "screen.hpp"
 
 int main(int argc, char** argv)
 {

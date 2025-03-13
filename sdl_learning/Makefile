@@ -1,5 +1,5 @@
 #OBJS specifies which files to compile as part of the project
-OBJS = texture_render.cpp
+OBJS = main.cpp chip8.cpp screen.cpp
 
 #CC specifies which compiler we're using
 CC = g++

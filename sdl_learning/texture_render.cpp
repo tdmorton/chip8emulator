@@ -10,8 +10,8 @@ and may not be redistributed without written permission.*/
 #include <chrono>
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 720;
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 
 //Starts up SDL and creates window
 bool init();
@@ -89,6 +89,7 @@ bool init()
 			gfx[136] = 0xFF;
 			gfx[137] = 0xFF;
 			gfx[138] = 0xFF;
+			gfx[1148] = 0xFF;
 			
 			
 				
