@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 	
 	int counter = 0;
 	
-	while (counter < 15)
+	while (counter < 20)
 	{
 		ch8.emulateOneCycle();
 		++counter;
