@@ -1,5 +1,5 @@
 #OBJS specifies which files to compile as part of the project
-OBJS = main.cpp chip8.cpp screen.cpp
+OBJS = 04_key_presses.cpp
 
 #CC specifies which compiler we're using
 CC = g++

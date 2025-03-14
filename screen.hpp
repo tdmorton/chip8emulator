@@ -8,6 +8,7 @@
 #include <thread>
 #include <chrono>
 #include <cstdint>
+#include <iostream>
 
 class screen
 {
@@ -25,6 +26,9 @@ class screen
 	
 	//Draws the contents of pixelBuffer onto the screen
 	bool drawScreen(uint8_t * pixelBuffer);
+
+	//Reads the current key press events
+	bool readKeys(uint8_t * keys);
 	
 	//The window we'll be rendering to
 	SDL_Window* gWindow = NULL;
@@ -34,6 +38,9 @@ class screen
 
 	//Current displayed texture
 	SDL_Texture* gTexture = NULL;
+
+	//Event handler
+	SDL_Event e;
 };
 
 #endif

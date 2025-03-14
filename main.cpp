@@ -3,6 +3,8 @@
 #include <fstream>
 #include "chip8.hpp"
 #include "screen.hpp"
+#include <chrono>
+#include <thread>
 
 int main(int argc, char** argv)
 {
@@ -33,11 +35,25 @@ int main(int argc, char** argv)
 	
 	int counter = 0;
 	
-	while (counter < 20)
+	while (counter < 5)
 	{
 		ch8.emulateOneCycle();
 		++counter;
 	}
+
+	bool timeToQuit = 0;
+	uint8_t * keys = {0};
+
+	screen myScreen;
+	myScreen.init();
+
+	while (!timeToQuit)
+	{
+		timeToQuit = myScreen.readKeys(keys);
+		std::this_thread::sleep_for(std::chrono::microseconds(1200));
+	}
+
+	std::cout << SDLK_ESCAPE << std::endl;
 	
 	return 0;
 }

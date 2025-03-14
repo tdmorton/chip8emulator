@@ -73,4 +73,34 @@ bool screen::drawScreen(uint8_t * pixelBuffer)
 	SDL_RenderClear(gRenderer);
 	SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);
 	SDL_RenderPresent(gRenderer);
+	return 0;
+}
+
+bool screen::readKeys(uint8_t * keys)
+{
+	//Handle events on queue
+	while( SDL_PollEvent( &e ) != 0 )
+	{
+		//User requests quit
+		if( e.type == SDL_QUIT)
+		{
+			return 1;
+		}
+		else
+		{
+			if (e.type == SDL_KEYDOWN)
+			{
+				if (e.key.keysym.sym == SDLK_ESCAPE)
+				{
+					return 1;
+				}
+				std::cout << "You pressed: " << e.key.keysym.sym << std::endl;
+			}
+			else if (e.type == SDL_KEYUP)
+			{
+				std::cout << "You released: " << e.key.keysym.sym << std::endl;
+			}
+		}
+	}
+	return 0;
 }
