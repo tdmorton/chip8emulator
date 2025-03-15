@@ -5,6 +5,34 @@ bool screen::init()
 	//Initialization flag
 	bool success = true;
 
+
+	uint8_t tempKeys[16] = 
+	{
+		SDLK_1,
+		SDLK_2,
+		SDLK_3,
+		SDLK_q,
+		SDLK_w,
+		SDLK_e,
+		SDLK_a,
+		SDLK_s,
+		SDLK_d,
+		SDLK_z,
+		SDLK_x,
+		SDLK_c,
+		SDLK_4,
+		SDLK_r,
+		SDLK_f,
+		SDLK_v
+	};
+
+	for (int i = 0; i < sizeof(chipKeys); ++i)
+	{
+		chipKeys[i] = tempKeys[i];
+	}
+
+	memset(keysPressed, 0, sizeof(keysPressed));
+
 	//Initialize SDL
 	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
 	{
@@ -76,8 +104,9 @@ bool screen::drawScreen(uint8_t * pixelBuffer)
 	return 0;
 }
 
-bool screen::readKeys(uint8_t * keys)
+bool screen::readKeys(uint8_t * chipKeys)
 {
+	std::cout << chipKeys[3] << std::endl;
 	//Handle events on queue
 	while( SDL_PollEvent( &e ) != 0 )
 	{
@@ -94,11 +123,30 @@ bool screen::readKeys(uint8_t * keys)
 				{
 					return 1;
 				}
-				std::cout << "You pressed: " << e.key.keysym.sym << std::endl;
+				else
+				{
+					std::cout << "pressed a key" << std::endl;
+					for (int i = 0; i < sizeof(chipKeys); ++i)
+					{
+						std::cout << "Checking " << chipKeys[i] << " key" << std::endl;
+						if (e.key.keysym.sym == chipKeys[i])
+						{
+							keysPressed[i] = 1;
+							std::cout << "Set key " << chipKeys[i] << " to pressed." << std::endl;
+						}
+					}
+				}
 			}
 			else if (e.type == SDL_KEYUP)
 			{
-				std::cout << "You released: " << e.key.keysym.sym << std::endl;
+				for (int i = 0; i < sizeof(chipKeys); ++i)
+				{
+					if (e.key.keysym.sym == chipKeys[i])
+					{
+						keysPressed[i] = 0;
+						std::cout << "Set key " << chipKeys[i] << " to unpressed." << std::endl;
+					}
+				}
 			}
 		}
 	}

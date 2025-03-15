@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 	while (!timeToQuit)
 	{
 		timeToQuit = myScreen.readKeys(keys);
-		std::this_thread::sleep_for(std::chrono::microseconds(1200));
+		std::this_thread::sleep_for(std::chrono::microseconds(100000));
 	}
 
 	std::cout << SDLK_ESCAPE << std::endl;

@@ -14,9 +14,17 @@ class screen
 {
 	public:
 	const int SCREEN_WIDTH = 640;
-	const int SCREEN_HEIGHT = 480;	
+	const int SCREEN_HEIGHT = 320;	
 	
-	uint32_t pixels[2048];			//SDL expects 32 bit integers for ARGB8888
+
+	//Pixel Buffer (SDL expects 32 bit integers for ARGB8888)
+	uint32_t pixels[2048];			
+
+	//map of all the keys to use
+	uint8_t chipKeys[16] ;
+
+	//map of if that key is currently pressed
+	int keysPressed[16];
 	
 	//Starts up SDL and creates window
 	bool init();
