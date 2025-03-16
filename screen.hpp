@@ -36,7 +36,7 @@ class screen
 	bool drawScreen(uint8_t * pixelBuffer);
 
 	//Reads the current key press events
-	bool readKeys(uint8_t * keys);
+	bool readKeys();
 	
 	//The window we'll be rendering to
 	SDL_Window* gWindow = NULL;

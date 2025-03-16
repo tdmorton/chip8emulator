@@ -29,7 +29,12 @@ bool screen::init()
 	for (int i = 0; i < sizeof(chipKeys); ++i)
 	{
 		chipKeys[i] = tempKeys[i];
+		std::cout << "Key " << i << ": " << chipKeys[i] << std::endl;
 	}
+
+	std::cout << "sizeof(chipKeys) = " << sizeof(chipKeys) << std::endl;
+
+	std::cout << chipKeys[3] << std::endl;
 
 	memset(keysPressed, 0, sizeof(keysPressed));
 
@@ -104,9 +109,9 @@ bool screen::drawScreen(uint8_t * pixelBuffer)
 	return 0;
 }
 
-bool screen::readKeys(uint8_t * chipKeys)
+bool screen::readKeys()
 {
-	std::cout << chipKeys[3] << std::endl;
+	//std::cout << chipKeys[3] << std::endl;
 	//Handle events on queue
 	while( SDL_PollEvent( &e ) != 0 )
 	{
@@ -125,10 +130,10 @@ bool screen::readKeys(uint8_t * chipKeys)
 				}
 				else
 				{
-					std::cout << "pressed a key" << std::endl;
+					//std::cout << "pressed a key" << std::endl;
 					for (int i = 0; i < sizeof(chipKeys); ++i)
 					{
-						std::cout << "Checking " << chipKeys[i] << " key" << std::endl;
+						//std::cout << "Checking " << chipKeys[i] << " key" << std::endl;
 						if (e.key.keysym.sym == chipKeys[i])
 						{
 							keysPressed[i] = 1;

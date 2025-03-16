@@ -16,13 +16,18 @@ int main(int argc, char** argv)
 	}
 	
 	chip8 ch8;
+
+	bool timeToQuit = 0;
+
+	screen myScreen;
 	
 	bool weGood = ch8.init();
+
+	bool screenGood = myScreen.init();
 	
 	std::cout << argc << std::endl;
-	
 
-	
+	std::cout << "chipKey[5]: " << myScreen.chipKeys[5] << std::endl;
 	
 	for (int i = 0; i < argc; ++i)
 	{
@@ -41,16 +46,10 @@ int main(int argc, char** argv)
 		++counter;
 	}
 
-	bool timeToQuit = 0;
-	uint8_t * keys = {0};
-
-	screen myScreen;
-	myScreen.init();
-
 	while (!timeToQuit)
 	{
-		timeToQuit = myScreen.readKeys(keys);
-		std::this_thread::sleep_for(std::chrono::microseconds(100000));
+		timeToQuit = myScreen.readKeys();
+		std::this_thread::sleep_for(std::chrono::microseconds(100));
 	}
 
 	std::cout << SDLK_ESCAPE << std::endl;
