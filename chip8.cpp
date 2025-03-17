@@ -123,7 +123,7 @@ bool chip8::checkRom(char* filename)
 	return 0;
 }
 
-bool chip8::emulateOneCycle()
+bool chip8::emulateOneCycle(bool drawFlag)
 {
 	//std::cout << "Emulation Cycle: " << std::hex << pc << std::endl;
 	opcode = memory[pc] << 8 | memory[pc+1];	// grab next opcode

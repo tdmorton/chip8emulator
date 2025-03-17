@@ -25,6 +25,9 @@ class screen
 
 	//map of if that key is currently pressed
 	int keysPressed[16];
+
+	//flag to tell main to draw screen
+	bool drawFlag = false;
 	
 	//Starts up SDL and creates window
 	bool init();

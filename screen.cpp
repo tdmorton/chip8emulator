@@ -106,6 +106,7 @@ bool screen::drawScreen(uint8_t * pixelBuffer)
 	SDL_RenderClear(gRenderer);
 	SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);
 	SDL_RenderPresent(gRenderer);
+	drawFlag = false;
 	return 0;
 }
 

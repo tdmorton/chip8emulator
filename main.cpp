@@ -40,9 +40,9 @@ int main(int argc, char** argv)
 	
 	int counter = 0;
 	
-	while (counter < 5)
+	while (counter < 30)
 	{
-		ch8.emulateOneCycle();
+		ch8.emulateOneCycle(myScreen.drawFlag);
 		++counter;
 	}
 

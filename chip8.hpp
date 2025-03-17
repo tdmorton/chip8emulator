@@ -23,15 +23,14 @@ class chip8
 	uint16_t soundTimer;	// 16 bit sound timer
 	
 	uint8_t key[16];		// keypad (0-F)
-	
-	bool drawFlag;			// flag sets whether to draw to the screen
 
 	bool init();		// initialize emulator
 	
 	bool loadRom(char* filename);	// loads rom from pc memory
 	bool checkRom(char* filename); // checks memory to make sure it matches rom
 	
-	bool emulateOneCycle();			// what it says on the tin
+	//Pass in drawFlag from screen.cpp
+	bool emulateOneCycle(bool drawFlag);
 	
 };
 	
