@@ -125,9 +125,21 @@ bool chip8::checkRom(char* filename)
 
 bool chip8::emulateOneCycle(bool drawFlag)
 {
+
+	if (pc <= 0 || pc >= 4096)
+	{
+		std::cerr << Program counter out of bounds << std::endl;
+		return 1;
+	}
+	if (sp <= 0 || sp >= 15)
+	{
+		std::cerr << Stack counter out of bounds << std::endl;
+		return 1;
+	}
+
 	//std::cout << "Emulation Cycle: " << std::hex << pc << std::endl;
 	opcode = memory[pc] << 8 | memory[pc+1];	// grab next opcode
-	pc += 2;									// increment pc by 2 (opcodes are 2 bytes)
+	//pc += 2;									// increment pc by 2 (opcodes are 2 bytes)
 	
 	// use switch statement, function pointer implementation maybe later
 	
@@ -144,11 +156,13 @@ bool chip8::emulateOneCycle(bool drawFlag)
 						screen[i] = 0x00;
 					}
 					drawFlag = true;
+					pc += 2;
 				}
 				case 0x00EE:
 				{
 					--sp;
 					pc = stack[sp];
+					pc += 2;
 				}
 				default:
 				{
@@ -157,12 +171,16 @@ bool chip8::emulateOneCycle(bool drawFlag)
 				}
 			}
 		}	
-		case 0x1000:
+		case 0x1000:													// 0x1NNN
 		{
+			pc = opcode & 0x0FFF;										// opcode = NNN
 			break;
 		}
 		case 0x2000:													// 0x2NNN
 		{
+			pc += 2;
+			sp = pc;
+			++sp;
 			break;
 		}
 		case 0x3000:													// 0x3XNN
