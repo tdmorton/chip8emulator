@@ -25,13 +25,13 @@ int main(int argc, char** argv)
 
 	bool screenGood = myScreen.init();
 	
-	std::cout << argc << std::endl;
+	//std::cout << argc << std::endl;
 
-	std::cout << "chipKey[5]: " << myScreen.chipKeys[5] << std::endl;
+	//std::cout << "chipKey[5]: " << myScreen.chipKeys[5] << std::endl;
 	
 	for (int i = 0; i < argc; ++i)
 	{
-		std::cout << i << ": " << argv[i] << std::endl;
+		//std::cout << i << ": " << argv[i] << std::endl;
 	}
 	
 	bool gotAFile = ch8.loadRom(argv[1]);
@@ -43,6 +43,10 @@ int main(int argc, char** argv)
 	while (counter < 30)
 	{
 		ch8.emulateOneCycle(myScreen.drawFlag);
+		if (myScreen.drawFlag)
+		{
+			myScreen.drawScreen(ch8.screen);
+		}
 		++counter;
 	}
 

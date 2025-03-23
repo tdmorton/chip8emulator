@@ -128,12 +128,12 @@ bool chip8::emulateOneCycle(bool drawFlag)
 
 	if (pc <= 0 || pc >= 4096)
 	{
-		std::cerr << Program counter out of bounds << std::endl;
+		std::cerr << "Program counter out of bounds" << std::endl;
 		return 1;
 	}
 	if (sp <= 0 || sp >= 15)
 	{
-		std::cerr << Stack counter out of bounds << std::endl;
+		std::cerr << "Stack counter out of bounds" << std::endl;
 		return 1;
 	}
 
@@ -157,12 +157,14 @@ bool chip8::emulateOneCycle(bool drawFlag)
 					}
 					drawFlag = true;
 					pc += 2;
+					break;
 				}
 				case 0x00EE:
 				{
 					--sp;
 					pc = stack[sp];
 					pc += 2;
+					break;
 				}
 				default:
 				{
@@ -178,8 +180,8 @@ bool chip8::emulateOneCycle(bool drawFlag)
 		}
 		case 0x2000:													// 0x2NNN
 		{
-			pc += 2;
-			sp = pc;
+			stack[sp] = pc;
+			pc = opcode & 0x0FFF;
 			++sp;
 			break;
 		}
@@ -187,16 +189,23 @@ bool chip8::emulateOneCycle(bool drawFlag)
 		{
 			if (V[(opcode & 0x0F00) >> 8] & (opcode & 0x00FF))			// if VX == NN
 			{
-				pc += 2;												// skip next instruction
+				pc += 4;												// skip next instruction
+			}
+			else
+			{
+				pc += 2;
 			}
 			break;
 		}
 		case 0x4000:													// 0x4XNN
 		{
-			if (V[(opcode & 0x0F00) >> 8] & (opcode & 0x00FF)){}		// if VX != NN
+			if (V[(opcode & 0x0F00) >> 8] & (opcode & 0x00FF))
+			{
+				pc += 2;
+			}		// if VX != NN
 			else
 			{
-				pc += 2;												// skip next instruction
+				pc += 4;												// skip next instruction
 			}
 			break;
 		}
@@ -204,18 +213,24 @@ bool chip8::emulateOneCycle(bool drawFlag)
 		{
 			if (V[(opcode & 0x0F00) >> 8] & V[(opcode & 0x00F0) >> 4])	// if VX == VY
 			{
-				pc += 2;												// skip next instruction
+				pc += 4;												// skip next instruction
+			}
+			else
+			{
+				pc += 2;
 			}
 			break;
 		}
 		case 0x6000:													// 0x6XNN
 		{
 			V[(opcode & 0x0F00) >> 8] = (opcode & 0x00FF);				// VX = NN
+			pc += 2;
 			break;
 		}
 		case 0x7000:													// 0x7XNN
 		{
 			V[(opcode & 0x0F00) >> 8] += (opcode & 0x00FF);				// VX += NN (no carry flag set)
+			pc += 2;
 			break;
 		}
 		case 0x8000:
@@ -225,11 +240,13 @@ bool chip8::emulateOneCycle(bool drawFlag)
 				case 0x0000:												// 0x8XY0
 				{
 					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4];	// VX = VY
+					pc += 2;
 					break;
 				}
 				case 0x0001:												// 0x8XY1
 				{
 					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x0F00) >> 8] | V[(opcode & 0x00F0) >> 4];	// VX |= VY
+					pc += 2;
 					break;
 				}
 				case 0x0002:												// 0x8XY2
@@ -240,6 +257,7 @@ bool chip8::emulateOneCycle(bool drawFlag)
 				case 0x0003:												// 0x8XY3
 				{
 					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x0F00) >> 8] ^ V[(opcode & 0x00F0) >> 4];	// VX ^= VY
+					pc += 2;
 					break;
 				}
 				case 0x0004:												// 0x8XY4
@@ -253,6 +271,7 @@ bool chip8::emulateOneCycle(bool drawFlag)
 						V[0xF] = 0;
 					}
 					V[(opcode & 0x0F00) >> 8] += V[(opcode & 0x00F0) >> 4];								// VX += VY carry set
+					pc += 2;
 					break;
 				}
 				case 0x0005:												// 0x8XY5
@@ -266,12 +285,14 @@ bool chip8::emulateOneCycle(bool drawFlag)
 						V[0xF] = 0;
 					}
 					V[(opcode & 0x0F00) >> 8] -= V[(opcode & 0x00F0) >> 4];								// VX -= VY carry set
+					pc += 2;
 					break;
 				}
 				case 0x0006:												// 0x8XY6
 				{
 					V[0xF] = (V[(opcode & 0x0F00) >> 8] & 0x0001);										// VF = VX LSB
 					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x0F00) >> 8] >> 1;							// VX >>= 1
+					pc += 2;
 					break;
 				}
 				case 0x0007:												// 0x8XY7
@@ -285,12 +306,14 @@ bool chip8::emulateOneCycle(bool drawFlag)
 						V[0xF] = 0;
 					}
 					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4] - V[(opcode & 0x0F00) >> 8];	// VX -= VY carry set
+					pc += 2;
 					break;
 				}
 				case 0x000E:												// 0x8XYE
 				{
 					V[0xF] = (V[(opcode & 0x0F00) >> 8] & 0x8000);										// VF = VX MSB
 					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x0F00) >> 8] << 1;							// VX <<= 1
+					pc += 2;
 					break;
 				}
 			}
@@ -299,30 +322,47 @@ bool chip8::emulateOneCycle(bool drawFlag)
 		{
 			if (V[(opcode & 0x0F00) >> 8] != V[(opcode & 0x00F0) >> 4])
 			{
-				pc += 2;												// skip next instruction
+				pc += 4;												// skip next instruction
+			}
+			else
+			{
+				pc += 2;
 			}
 			break;
 		}
 		case 0xA000:
 		{
 			I = (opcode & 0x0FFF) >> 4;
+			pc += 2;
 			break;
 		}
 		case 0xB000:
 		{
-			stack[sp] = pc;
-			++sp;
+			//stack[sp] = pc;
+			//++sp;				//stack does not need to be used
 			pc = V[0] + ((opcode & 0x0FFF) >> 4);
+			pc += 2;
 			break;
 		}
 		case 0xC000:
 		{
 			V[(opcode & 0x0F00) >> 8] = static_cast<uint8_t>(dist256(rng) & (opcode & 0x00FF));
+			pc += 2;
 			break;
 		}
 		case 0xD000:
 		{
 			//drawSprite(V[(opcode & 0x0F00) >> 8], V[(opcode & 0x00F0) >> 4], V[(opcode & 0x000F)]);
+			int x = V[(opcode && 0x0F00)>>8];
+			int y = V[(opcode && 0x00F0)>>4];
+			int h = V[opcode && 0x000F];
+
+			for (int i = 0; i < h; ++i)
+			{
+				screen[((y*64) + x) + (8*i)] = memory[I+i];
+			}
+
+			pc += 2;
 			break;
 		}
 		case 0xE000:

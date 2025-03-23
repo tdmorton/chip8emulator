@@ -29,12 +29,12 @@ bool screen::init()
 	for (int i = 0; i < sizeof(chipKeys); ++i)
 	{
 		chipKeys[i] = tempKeys[i];
-		std::cout << "Key " << i << ": " << chipKeys[i] << std::endl;
+		//std::cout << "Key " << i << ": " << chipKeys[i] << std::endl;
 	}
 
-	std::cout << "sizeof(chipKeys) = " << sizeof(chipKeys) << std::endl;
+	//std::cout << "sizeof(chipKeys) = " << sizeof(chipKeys) << std::endl;
 
-	std::cout << chipKeys[3] << std::endl;
+	//std::cout << chipKeys[3] << std::endl;
 
 	memset(keysPressed, 0, sizeof(keysPressed));
 
