@@ -353,15 +353,26 @@ bool chip8::emulateOneCycle(bool drawFlag)
 		case 0xD000:
 		{
 			//drawSprite(V[(opcode & 0x0F00) >> 8], V[(opcode & 0x00F0) >> 4], V[(opcode & 0x000F)]);
+			// x coordinate of sprite
 			int x = V[(opcode && 0x0F00)>>8];
+			// y coordinate of sprite
 			int y = V[(opcode && 0x00F0)>>4];
-			int h = V[opcode && 0x000F];
+			// number of bytes
+			int n = V[opcode && 0x000F];
+			// width (always 1 byte)
+			int w = 8;
+			// VF is set to 1 if collision, 0 if not
+			V[0xF] = 0;
 
-			for (int i = 0; i < h; ++i)
+			for (int i = 0; i < n; i++)
 			{
-				screen[((y*64) + x) + (8*i)] = memory[I+i];
+				for (int j = 0; j < w; j++)
+				{
+					screen[((y*64) + x) + (8*i)] = memory[I+i];
+				}
+				
 			}
-
+			drawFlag = true;
 			pc += 2;
 			break;
 		}
