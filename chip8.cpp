@@ -55,24 +55,23 @@ bool chip8::loadRom(char* filename)
 {
 	std::ifstream file(filename, std::ios::binary);		// grabs rom
 	
-	//try
-	//{
-		if (!file) 
-		{
-			std::cerr << "Could not open file " << filename << std::endl;
-			return 1;
-		}
+	if (!file) 
+	{
+		std::cerr << "Could not open file " << filename << std::endl;
+		return 1;
+	}
 		
-		uint8_t tempRom;
+	uint8_t tempRom;
+	pc = 0x200;
 		
-		while(file.read(reinterpret_cast<char*>(&tempRom), sizeof(tempRom)))
-		{
-			memory[pc] = tempRom;
-			//std::cout << std::hex << "Addr: " << pc-0x200 << "  ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
-			++pc;
-		}
+	while(file.read(reinterpret_cast<char*>(&tempRom), sizeof(tempRom)))
+	{
+		memory[pc] = tempRom;
+		//std::cout << std::hex << "PC: " << pc << "  ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
+		++pc;
+	}
 		
-		file.close();
+	file.close();
 	
 	pc = 0x200; 			// reset pc
 	
@@ -83,57 +82,45 @@ bool chip8::checkRom(char* filename)
 {
 	std::ifstream file(filename, std::ios::binary);		// grabs rom
 	
-	//try
-	//{
-		if (!file) 
-		{
-			std::cerr << "Cannot find file " << filename << std::endl;
-			return 1;//throw std::runtime_error("Could not open file");
-		}
-		
-		uint8_t tempRom;
-		pc = 0x200;
-		
-		while(tempRom = file.get())
-		{
-			//std::cout << std::hex << "ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
-			if (tempRom != memory[pc])
-			{
-				return 1;
-			}
-			++pc;
-		}
-		
-		if (file.bad())
-		{
-		//	throw std::runtime_error("Error occurred during reading file");
-		}
-		
-		file.close();
-	//}
-	//catch(std::ifstream badFile)
-	//{
-		
-	//	return 1;
-		
-	//}
+	//std::cout << "Checking ROM vs MEM" << std::endl;
 	
+	if (!file) 
+	{
+		std::cerr << "Could not open file " << filename << std::endl;
+		return 1;
+	}
+		
+	uint8_t tempRom;
 	pc = 0x200;
+		
+	while(file.read(reinterpret_cast<char*>(&tempRom), sizeof(tempRom)))
+	{
+		if (memory[pc] != tempRom)
+		{
+			return 1;
+		}
+		//std::cout << std::hex << "PC: " << pc << "  ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
+		++pc;
+	}
+		
+	file.close();
+	
+	pc = 0x200; 			// reset pc
 	
 	return 0;
 }
 
-bool chip8::emulateOneCycle(bool drawFlag)
+bool chip8::emulateOneCycle()
 {
 
-	if (pc <= 0 || pc >= 4096)
+	if (pc < 0 || pc >= 4096)
 	{
-		std::cerr << "Program counter out of bounds" << std::endl;
+		std::cerr << "Program counter out of bounds; pc = " << pc << std::endl;
 		return 1;
 	}
-	if (sp <= 0 || sp >= 15)
+	if (sp < 0 || sp > 15)
 	{
-		std::cerr << "Stack counter out of bounds" << std::endl;
+		std::cerr << "Stack counter out of bounds; sp = " << sp << std::endl;
 		return 1;
 	}
 
@@ -143,11 +130,13 @@ bool chip8::emulateOneCycle(bool drawFlag)
 	
 	// use switch statement, function pointer implementation maybe later
 	
-	uint8_t X = X;
-	uint8_t Y = Y;
+	uint8_t X = (opcode & 0x0F00) >> 8;
+	uint8_t Y = (opcode & 0x00F0) >> 4;
 	uint8_t N = opcode & 0x000F;
 	uint8_t NN = opcode & 0x00FF;
 	uint16_t NNN = opcode & 0x0FFF;
+	
+	std::cout << "Opcode: 0x" << std::hex << static_cast<int>((opcode & 0xF000) >> 12) << static_cast<int>(X) << static_cast<int>(Y) << static_cast<int>(N) << " PC = " << pc << std::endl;
 	
 	switch(opcode & 0xF000)						// bit mask, narrow switch statement to only 0-F
 	{
@@ -163,6 +152,7 @@ bool chip8::emulateOneCycle(bool drawFlag)
 					}
 					drawFlag = true;
 					pc += 2;
+					//std::cout << std::hex << pc << std::endl;
 					break;
 				}
 				case 0x00EE:
@@ -174,10 +164,12 @@ bool chip8::emulateOneCycle(bool drawFlag)
 				}
 				default:
 				{
-					std::cout << "Unknown Opcode: " << std::hex << opcode << std::endl;
+					//std::cout << "Unknown Opcode: " << std::hex << opcode  << " pc = " << pc << std::endl;
+					pc += 2;
 					break;
 				}
 			}
+			break;
 		}	
 		case 0x1000:													// 0x1NNN
 		{
@@ -364,7 +356,7 @@ bool chip8::emulateOneCycle(bool drawFlag)
 			// y coordinate of sprite
 			int y = V[Y];
 			// number of bytes
-			int n = V[N];
+			int n = N;
 			// width (always 1 byte)
 			int w = 8;
 			// bit mask for pixels in byte
@@ -382,7 +374,7 @@ bool chip8::emulateOneCycle(bool drawFlag)
 						{
 							V[0x0F] = 1;
 						}
-						screen[(((y+i)*64) + (x+j))] ^= 1;
+						screen[(((y+i)*64) + (x+j))] ^= 0xFF;//1;
 					}
 				}
 			}

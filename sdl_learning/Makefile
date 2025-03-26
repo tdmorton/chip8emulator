@@ -1,5 +1,5 @@
 #OBJS specifies which files to compile as part of the project
-OBJS = 04_key_presses.cpp
+OBJS = texture_render.cpp
 
 #CC specifies which compiler we're using
 CC = g++

@@ -15,6 +15,8 @@ int main(int argc, char** argv)
 		return 1;				// exit main
 	}
 	
+	std::chrono::milliseconds frame_duration(1000 / 60); // 16.67 milliseconds for 60 FPS
+	
 	chip8 ch8;
 
 	bool timeToQuit = 0;
@@ -38,25 +40,34 @@ int main(int argc, char** argv)
 	
 	bool memLoadedGood = ch8.checkRom(argv[1]);
 	
+	if (memLoadedGood)
+	{
+		std::cout << "Memory does not match ROM" << std::endl;
+		return 1;
+	}
+	
 	int counter = 0;
 	
-	while (counter < 30)
-	{
-		ch8.emulateOneCycle(myScreen.drawFlag);
-		if (myScreen.drawFlag)
-		{
-			myScreen.drawScreen(ch8.screen);
-		}
-		++counter;
-	}
-
 	while (!timeToQuit)
 	{
+		std::chrono::steady_clock::time_point frame_start = std::chrono::steady_clock::now();
+		ch8.emulateOneCycle();
+		if (ch8.drawFlag)
+		{
+			myScreen.drawScreen(ch8.screen);
+			ch8.drawFlag = false;
+		}
+		++counter;
 		timeToQuit = myScreen.readKeys();
-		std::this_thread::sleep_for(std::chrono::microseconds(100));
+		std::chrono::steady_clock::time_point frame_end = std::chrono::steady_clock::now();
+        std::chrono::milliseconds elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start);
+		if (elapsed_time < frame_duration) 
+		{
+            std::this_thread::sleep_for(frame_duration - elapsed_time);
+		}
 	}
 
-	std::cout << SDLK_ESCAPE << std::endl;
+	//std::cout << SDLK_ESCAPE << std::endl;
 	
 	return 0;
 }
