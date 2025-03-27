@@ -396,12 +396,90 @@ bool chip8::emulateOneCycle()
 				}
 			}
 		}
+		case 0xF000:
+		{
+			switch(opcode & 0x000F)
+			{
+				case 0x0003:
+				{
+					pc += 2;
+					break;
+				}
+				case 0x0005:
+				{
+					switch(opcode & 0x00F0)
+					{
+						case 0x0010:
+						{
+							delayTimer = V[X];
+							pc += 2;
+							break;
+						}
+						case 0x0050:
+						{
+							for (int i = 0; i < X; i++)
+							{
+								memory[I+i] = V[i];
+							}
+							pc += 2;
+							break;
+						}
+						case 0x0060:
+						{
+							for (int i = 0; i < X; i++)
+							{
+								V[i] = memory[i+i];
+							}
+							pc += 2;
+							break;
+						}
+					}
+				}
+				case 0x0007:
+				{
+					V[X] = delayTimer;
+					pc += 2;
+					break;
+				}
+				case 0x0008:
+				{
+					soundTimer = V[X];
+					pc += 2;
+					break;
+				}
+				case 0x000A:
+				{
+					pc += 2;
+					break;
+				}
+				case 0x000E:
+				{
+					if (I+V[X] > 0x0FFF)
+					{
+						V[0xF] = 1; // may or may not be needed
+					}
+					I += V[X];
+					pc += 2;
+					break;
+				}
+			}
+		}
 		default:
 		{
 			std::cout << "Unknown Opcode: " << std::hex << opcode << std::endl;
 			break;
 		}
 	}
+
+	if (delayTimer > 0)
+	{
+		delayTimer--;
+	}
+	if (soundTimer > 0)
+	{
+		soundTimer--;
+	}
+
 	return 0;
 }
 	
