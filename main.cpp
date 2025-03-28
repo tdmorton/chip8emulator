@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <fstream>
 #include "chip8.hpp"
@@ -6,13 +7,42 @@
 #include <chrono>
 #include <thread>
 
+bool validateFileName(char*);
+void printHelp();
+
 int main(int argc, char** argv)
 {
 	
 	if (argc < 2)
 	{
-		std::cerr << "Please include a name for the ROM to load. Type --help for details." << std::endl;
+		std::cerr << "Please include a name for the ROM to load. Type -h for details." << std::endl;
 		return 1;				// exit main
+	}
+	
+	bool debugMode = false;
+	char* filename;
+	
+	if (!strcmp(argv[1], "-h"))
+	{
+		printHelp();
+		return 0;
+	}
+	else if (!validateFileName(argv[1]))
+	{
+		filename = argv[1];
+	}
+	else if (!strcmp(argv[1], "-d") && argc > 2)
+	{
+		debugMode = true;
+		if (!validateFileName(argv[2]))
+		{
+			filename = argv[2];
+		}
+	}
+	else
+	{
+		std::cout << "Invalid argument(s), use -h to see the correct usage" << std::endl;
+		return 1;			
 	}
 	
 	std::chrono::milliseconds frame_duration(1000 / 60); // 16.67 milliseconds for 60 FPS
@@ -23,9 +53,9 @@ int main(int argc, char** argv)
 
 	screen myScreen;
 	
-	bool weGood = ch8.init();
+	bool ch8Init = ch8.init();
 
-	bool screenGood = myScreen.init();
+	bool screenInit = myScreen.init();
 	
 	//std::cout << argc << std::endl;
 
@@ -36,11 +66,11 @@ int main(int argc, char** argv)
 		//std::cout << i << ": " << argv[i] << std::endl;
 	}
 	
-	bool gotAFile = ch8.loadRom(argv[1]);
+	bool fileLoaded = ch8.loadRom(argv[1]);
 	
-	bool memLoadedGood = ch8.checkRom(argv[1]);
+	bool memBad = ch8.checkRom(argv[1]);
 	
-	if (memLoadedGood)
+	if (memBad)
 	{
 		std::cout << "Memory does not match ROM" << std::endl;
 		return 1;
@@ -70,4 +100,27 @@ int main(int argc, char** argv)
 	//std::cout << SDLK_ESCAPE << std::endl;
 	
 	return 0;
+}
+
+bool validateFileName(char* filename)
+{
+	int length = strlen(filename);
+	char fileExtension[4];
+	for (int i = 0; i < 4; i++)
+	{
+		fileExtension[i] = filename[i+(length-5)];
+	}
+	if (fileExtension == ".ch8")
+	{
+		return 0;
+	}
+	else 
+	{
+		return 1;
+	}
+}
+void printHelp()
+{
+	std::cout << "To run, write a command of the form: ./output [-d] filename.ch8" << std::endl;
+	std::cout << "To view this help screen, use this command: ./output -h" << std::endl;
 }
