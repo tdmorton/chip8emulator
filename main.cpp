@@ -46,12 +46,12 @@ int main(int argc, char** argv)
 	}
 	
 	std::chrono::milliseconds frame_duration(1000 / 60); // 16.67 milliseconds for 60 FPS
-	
-	chip8 ch8;
 
 	bool timeToQuit = 0;
 
 	screen myScreen;
+
+	chip8 ch8;
 	
 	bool ch8Init = ch8.init();
 
@@ -66,9 +66,9 @@ int main(int argc, char** argv)
 		//std::cout << i << ": " << argv[i] << std::endl;
 	}
 	
-	bool fileLoaded = ch8.loadRom(argv[1]);
+	bool fileLoaded = ch8.loadRom(filename);
 	
-	bool memBad = ch8.checkRom(argv[1]);
+	bool memBad = ch8.checkRom(filename);
 	
 	if (memBad)
 	{
@@ -81,10 +81,10 @@ int main(int argc, char** argv)
 	while (!timeToQuit)
 	{
 		std::chrono::steady_clock::time_point frame_start = std::chrono::steady_clock::now();
-		ch8.emulateOneCycle();
+		ch8.emulateOneCycle(myScreen);
 		if (ch8.drawFlag)
 		{
-			myScreen.drawScreen(ch8.screen);
+			myScreen.drawScreen(ch8.imBuf);
 			ch8.drawFlag = false;
 		}
 		++counter;
@@ -105,12 +105,16 @@ int main(int argc, char** argv)
 bool validateFileName(char* filename)
 {
 	int length = strlen(filename);
+	if (length < 5)
+	{
+		return 1;
+	}
 	char fileExtension[4];
 	for (int i = 0; i < 4; i++)
 	{
-		fileExtension[i] = filename[i+(length-5)];
+		fileExtension[i] = filename[i+(length-4)];
 	}
-	if (fileExtension == ".ch8")
+	if (!strcmp(fileExtension, ".ch8"))
 	{
 		return 0;
 	}

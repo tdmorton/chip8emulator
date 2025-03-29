@@ -19,7 +19,7 @@ bool chip8::init()
 	memset(V, 0, sizeof(V));
 	memset(memory, 0, sizeof(memory));
 	memset(stack, 0, sizeof(stack));
-	memset(screen, 0, sizeof(screen));
+	memset(imBuf, 0, sizeof(imBuf));
 	
 
 	uint8_t fonts[80] =
@@ -110,7 +110,7 @@ bool chip8::checkRom(char* filename)
 	return 0;
 }
 
-bool chip8::emulateOneCycle()
+bool chip8::emulateOneCycle(screen myScreen)
 {
 
 	if (pc < 0 || pc >= 4096)
@@ -148,7 +148,7 @@ bool chip8::emulateOneCycle()
 				{
 					for (int i = 0; i < 64*32; ++i)
 					{
-						screen[i] = 0x00;
+						imBuf[i] = 0x00;
 					}
 					drawFlag = true;
 					pc += 2;
@@ -370,11 +370,11 @@ bool chip8::emulateOneCycle()
 				{
 					if ((memory[I+i] & mask >> j) != 0)
 					{
-						if (screen[(((y+i)*64) + (x+j))] == 1)
+						if (imBuf[(((y+i)*64) + (x+j))] == 1)
 						{
 							V[0x0F] = 1;
 						}
-						screen[(((y+i)*64) + (x+j))] ^= 0xFF;//1;
+						imBuf[(((y+i)*64) + (x+j))] ^= 0xFF;//1;
 					}
 				}
 			}
@@ -388,10 +388,12 @@ bool chip8::emulateOneCycle()
 			{
 				case 0x0090:
 				{
+					pc+=2;
 					break;
 				}
 				case 0x00A0:
 				{
+					pc+=2;
 					break;
 				}
 			}
@@ -402,6 +404,9 @@ bool chip8::emulateOneCycle()
 			{
 				case 0x0003:
 				{
+					memory[I] = static_cast<uint8_t>(V[X]/100); // hundreds place
+					memory[I+1] = static_cast<uint8_t>((V[X]/10)%10); // tens place
+					memory[I+2] = static_cast<uint8_t>(V[X]%10); // ones place
 					pc += 2;
 					break;
 				}
@@ -449,6 +454,13 @@ bool chip8::emulateOneCycle()
 				}
 				case 0x000A:
 				{
+					for (int i = 0; i < 16; i++)
+					{
+						if (myScreen.keysPressed[i])
+						{
+							V[X] = myScreen.chipKeys[i];
+						}
+					}
 					pc += 2;
 					break;
 				}

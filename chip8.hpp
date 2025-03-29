@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string>
+#include "screen.hpp"
 
 class chip8
 {
@@ -17,7 +18,7 @@ class chip8
 	uint16_t sp;		// stack pointer
 	uint16_t stack[16]; // 16 16-bit stack data
 	
-	uint8_t screen[64*32]; // 64x32 pixel screen buffer
+	uint8_t imBuf[64*32]; // 64x32 pixel screen buffer
 	
 	uint16_t delayTimer;	// 16 bit delay timer
 	uint16_t soundTimer;	// 16 bit sound timer
@@ -31,8 +32,8 @@ class chip8
 	bool loadRom(char* filename);	// loads rom from pc memory
 	bool checkRom(char* filename); // checks memory to make sure it matches rom
 	
-	//Pass in drawFlag from screen.cpp
-	bool emulateOneCycle();
+	//Pass in screen object
+	bool emulateOneCycle(screen myScreen);
 	
 };
 	
