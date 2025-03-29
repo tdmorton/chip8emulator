@@ -454,6 +454,7 @@ bool chip8::emulateOneCycle(screen myScreen)
 				}
 				case 0x000A:
 				{
+					bool keyPressed = false;
 					for (int i = 0; i < 16; i++)
 					{
 						if (myScreen.keysPressed[i])
@@ -461,7 +462,11 @@ bool chip8::emulateOneCycle(screen myScreen)
 							V[X] = myScreen.chipKeys[i];
 						}
 					}
-					pc += 2;
+					if (keyPressed)
+					{
+						pc += 2;
+						keyPressed = false;
+					}
 					break;
 				}
 				case 0x000E:
