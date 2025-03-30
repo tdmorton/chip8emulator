@@ -388,12 +388,26 @@ bool chip8::emulateOneCycle(screen myScreen)
 			{
 				case 0x0090:
 				{
-					pc+=2;
+					if (myScreen.keysPressed[V[X]])
+					{
+						pc += 4;
+					}
+					else
+					{
+						pc += 2;
+					}
 					break;
 				}
 				case 0x00A0:
 				{
-					pc+=2;
+					if (!myScreen.keysPressed[V[X]])
+					{
+						pc += 4;
+					}
+					else
+					{
+						pc += 2;
+					}
 					break;
 				}
 			}
