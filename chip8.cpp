@@ -243,13 +243,14 @@ bool chip8::emulateOneCycle(screen myScreen)
 				}
 				case 0x0001:												// 0x8XY1
 				{
-					V[X] = V[X] | V[Y];	// VX |= VY
+					V[X] |= V[Y];	// VX |= VY
 					pc += 2;
 					break;
 				}
 				case 0x0002:												// 0x8XY2
 				{
-					V[X] = V[X] & V[Y];	// VX &= VY
+					V[X] &= V[Y];	// VX &= VY
+					pc += 2;
 					break;
 				}				
 				case 0x0003:												// 0x8XY3
@@ -315,6 +316,7 @@ bool chip8::emulateOneCycle(screen myScreen)
 					break;
 				}
 			}
+			break;
 		}
 		case 0x9000:													// 0x9XY0
 		{
@@ -436,23 +438,26 @@ bool chip8::emulateOneCycle(screen myScreen)
 						}
 						case 0x0050:
 						{
-							for (int i = 0; i < X; i++)
+							for (int i = 0; i <= X; ++i)
 							{
 								memory[I+i] = V[i];
 							}
+							I = I + X + 1;
 							pc += 2;
 							break;
 						}
 						case 0x0060:
 						{
-							for (int i = 0; i < X; i++)
+							for (int i = 0; i <= X; ++i)
 							{
-								V[i] = memory[i+i];
+								V[i] = memory[I];
 							}
+							I = I + X + 1;
 							pc += 2;
 							break;
 						}
 					}
+					break;
 				}
 				case 0x0007:
 				{
@@ -494,6 +499,7 @@ bool chip8::emulateOneCycle(screen myScreen)
 					break;
 				}
 			}
+			break;
 		}
 		default:
 		{
