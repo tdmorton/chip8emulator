@@ -319,7 +319,7 @@ bool chip8::emulateOneCycle(screen myScreen)
 				case 0x000E:												// 0x8XYE
 				{
 					uint8_t carry;
-					carry = (V[X] & 0x80);										// VF = VX MSB
+					carry = V[X] >> 8;										// VF = VX MSB
 					V[X] = V[X] << 1;							// VX <<= 1
 					V[0xF] = carry;
 					pc += 2;
