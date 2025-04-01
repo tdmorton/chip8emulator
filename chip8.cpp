@@ -450,7 +450,7 @@ bool chip8::emulateOneCycle(screen myScreen)
 						{
 							for (int i = 0; i <= X; ++i)
 							{
-								V[i] = memory[I];
+								V[i] = memory[I+i];
 							}
 							I = I + X + 1;
 							pc += 2;
