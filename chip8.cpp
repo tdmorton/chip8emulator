@@ -490,6 +490,7 @@ bool chip8::emulateOneCycle(screen myScreen)
 						if (myScreen.keysPressed[i])
 						{
 							V[X] = myScreen.chipKeys[i];
+							keyPressed = true;
 						}
 					}
 					if (keyPressed)
