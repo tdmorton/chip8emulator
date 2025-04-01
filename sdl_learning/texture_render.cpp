@@ -80,12 +80,12 @@ bool init()
 				gfx[i] = 0x00;
 			}
 			
-			gfx[0] = 0xFF;
-			gfx[2] = 0xFF;
-			gfx[3] = 0xFF;
-			gfx[6] = 0xFF;
-			gfx[7] = 0xFF;
-			gfx[71] = 0xFF;
+			gfx[0] = 0x1;
+			gfx[2] = 0x1;
+			gfx[3] = 0x1;
+			gfx[6] = 0x1;
+			gfx[7] = 0x1;
+			gfx[71] = 0x1;
 			gfx[135] = 0xFF;
 			gfx[136] = 0xFF;
 			gfx[137] = 0xFF;
@@ -97,7 +97,7 @@ bool init()
 				// Store pixels in temporary buffer
             for (int i = 0; i < 2048; ++i) {
                 uint8_t pixel = gfx[i];
-                pixels[i] = (pixel & 0xFFFFFFFF)| (pixel<<8 & 0xFFFFFFFF) | (pixel<<16 & 0xFFFFFFFF) | 0xFF000000;
+                pixels[i] = (pixel * 0x00FFFFFF) | 0xFF000000;
             }
             // Update SDL texture
             SDL_UpdateTexture(gTexture, NULL, pixels, 64 * sizeof(Uint32));

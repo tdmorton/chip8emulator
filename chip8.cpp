@@ -261,57 +261,67 @@ bool chip8::emulateOneCycle(screen myScreen)
 				}
 				case 0x0004:												// 0x8XY4
 				{
+					uint8_t carry;
 					if ((V[X] + V[Y]) > 0xFF)
 					{
-						V[0xF] = 1;
+						carry = 1;
 					}
 					else
 					{
-						V[0xF] = 0;
+						carry = 0;
 					}
 					V[X] += V[Y];								// VX += VY carry set
+					V[0xF] = carry;
 					pc += 2;
 					break;
 				}
 				case 0x0005:												// 0x8XY5
 				{
+					uint8_t carry;
 					if (V[X] >= V[Y])							// VF = !underflow
 					{
-						V[0xF] = 1;
+						carry = 1;
 					}
 					else
 					{
-						V[0xF] = 0;
+						carry = 0;
 					}
 					V[X] -= V[Y];								// VX -= VY carry set
+					V[0xF] = carry;
 					pc += 2;
 					break;
 				}
 				case 0x0006:												// 0x8XY6
 				{
-					V[0xF] = (V[X] & 0x0001);										// VF = VX LSB
+					uint8_t carry;
+					carry = (V[X] & 0x0001);										// VF = VX LSB
 					V[X] = V[X] >> 1;							// VX >>= 1
+					V[0xF] = carry;
 					pc += 2;
 					break;
 				}
 				case 0x0007:												// 0x8XY7
 				{
+					uint8_t carry;
 					if (V[Y] >= V[X])							// VF = !underflow
 					{
-						V[0xF] = 1;
+						carry = 1;
 					}
 					else
 					{
-						V[0xF] = 0;
+						carry = 0;
 					}
 					V[X] = V[Y] - V[X];	// VX -= VY carry set
+					V[0xF] = carry;
 					pc += 2;
 					break;
 				}
 				case 0x000E:												// 0x8XYE
 				{
-					V[0xF] = (V[X] & 0x8000);										// VF = VX MSB
+					uint8_t carry;
+					carry = (V[X] & 0x80);										// VF = VX MSB
 					V[X] = V[X] << 1;							// VX <<= 1
+					V[0xF] = carry;
 					pc += 2;
 					break;
 				}
@@ -376,7 +386,7 @@ bool chip8::emulateOneCycle(screen myScreen)
 						{
 							V[0x0F] = 1;
 						}
-						imBuf[(((y+i)*64) + (x+j))] ^= 0xFF;//1;
+						imBuf[((y+i)*64) + (x+j)] ^= 0x1;
 					}
 				}
 			}

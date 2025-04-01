@@ -98,7 +98,7 @@ bool screen::drawScreen(uint8_t * pixelBuffer)
 	for (int i = 0; i < 2048; ++i) 
 	{
 		uint8_t pixel = pixelBuffer[i];
-		pixels[i] = (pixel & 0xFFFFFFFF)| (pixel<<8 & 0xFFFFFFFF) | (pixel<<16 & 0xFFFFFFFF) | 0xFF000000;
+		pixels[i] = (pixel * 0x00FFFFFF) | 0xFF000000;
 	}
 	// Update SDL texture
 	SDL_UpdateTexture(gTexture, NULL, pixels, 64 * sizeof(Uint32));
