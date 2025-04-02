@@ -8,6 +8,7 @@ bool screen::init()
 
 	uint8_t tempKeys[16] = 
 	{
+		SDLK_x,
 		SDLK_1,
 		SDLK_2,
 		SDLK_3,
@@ -18,7 +19,6 @@ bool screen::init()
 		SDLK_s,
 		SDLK_d,
 		SDLK_z,
-		SDLK_x,
 		SDLK_c,
 		SDLK_4,
 		SDLK_r,

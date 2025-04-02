@@ -44,7 +44,7 @@ bool chip8::init()
 
 	for (int i = 0x050; i < 0x0A0; i++)	// fontset is stored from 0x050 to 0x0A0
 	{
-		memory[i] = fonts[i];
+		memory[i] = fonts[i-0x050];
 	}
 	
 	return 0;
@@ -480,6 +480,12 @@ bool chip8::emulateOneCycle(screen myScreen)
 				{
 					soundTimer = V[X];
 					pc += 2;
+					break;
+				}
+				case 0x0009:
+				{
+					I = (V[X] * 5) + 0x50;
+					pc +=2;
 					break;
 				}
 				case 0x000A:
