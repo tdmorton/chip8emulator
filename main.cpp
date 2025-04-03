@@ -12,6 +12,8 @@ void printHelp();
 
 int main(int argc, char** argv)
 {
+
+	int executionSpeed = 360;
 	
 	if (argc < 2)
 	{
@@ -45,7 +47,7 @@ int main(int argc, char** argv)
 		return 1;			
 	}
 	
-	std::chrono::milliseconds frame_duration(1000 / 60); // 16.67 milliseconds for 60 FPS
+	std::chrono::milliseconds frame_duration(1000 / executionSpeed);
 
 	bool timeToQuit = 0;
 
@@ -56,15 +58,6 @@ int main(int argc, char** argv)
 	bool ch8Init = ch8.init();
 
 	bool screenInit = myScreen.init();
-	
-	//std::cout << argc << std::endl;
-
-	//std::cout << "chipKey[5]: " << myScreen.chipKeys[5] << std::endl;
-	
-	for (int i = 0; i < argc; ++i)
-	{
-		//std::cout << i << ": " << argv[i] << std::endl;
-	}
 	
 	bool fileLoaded = ch8.loadRom(filename);
 	
@@ -81,14 +74,14 @@ int main(int argc, char** argv)
 	while (!timeToQuit)
 	{
 		std::chrono::steady_clock::time_point frame_start = std::chrono::steady_clock::now();
-		ch8.emulateOneCycle(myScreen);
+		ch8.emulateOneCycle(myScreen, debugMode);
 		if (ch8.drawFlag)
 		{
 			myScreen.drawScreen(ch8.imBuf);
 			ch8.drawFlag = false;
 		}
 		++counter;
-		timeToQuit = myScreen.readKeys();
+		timeToQuit = myScreen.readKeys(debugMode);
 		std::chrono::steady_clock::time_point frame_end = std::chrono::steady_clock::now();
         std::chrono::milliseconds elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start);
 		if (elapsed_time < frame_duration) 
@@ -96,8 +89,6 @@ int main(int argc, char** argv)
             std::this_thread::sleep_for(frame_duration - elapsed_time);
 		}
 	}
-
-	//std::cout << SDLK_ESCAPE << std::endl;
 	
 	return 0;
 }
@@ -125,6 +116,5 @@ bool validateFileName(char* filename)
 }
 void printHelp()
 {
-	std::cout << "To run, write a command of the form: ./output [-d] filename.ch8" << std::endl;
-	std::cout << "To view this help screen, use this command: ./output -h" << std::endl;
+	std::cout << "usage: ./chip8 [-d] [-h] rom.ch8" << std::endl;
 }

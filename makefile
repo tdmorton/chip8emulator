@@ -22,7 +22,7 @@ COMPILER_FLAGS = -w -g
 LINKER_FLAGS = -lSDL2 -lSDL2_image
 
 #OBJ_NAME specifies the name of our exectuable
-OBJ_NAME = output
+OBJ_NAME = chip8
 
 #This is the target that compiles our executable
 all : $(OBJS)
@@ -31,4 +31,4 @@ all : $(OBJS)
 
 	
 clean: 
-	rm *.o output
+	rm chip8

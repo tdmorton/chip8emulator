@@ -33,7 +33,7 @@ class chip8
 	bool checkRom(char* filename); // checks memory to make sure it matches rom
 	
 	//Pass in screen object
-	bool emulateOneCycle(screen myScreen);
+	bool emulateOneCycle(screen myScreen, bool debugMode);
 	
 };
 	

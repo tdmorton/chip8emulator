@@ -67,7 +67,6 @@ bool chip8::loadRom(char* filename)
 	while(file.read(reinterpret_cast<char*>(&tempRom), sizeof(tempRom)))
 	{
 		memory[pc] = tempRom;
-		//std::cout << std::hex << "PC: " << pc << "  ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
 		++pc;
 	}
 		
@@ -82,7 +81,6 @@ bool chip8::checkRom(char* filename)
 {
 	std::ifstream file(filename, std::ios::binary);		// grabs rom
 	
-	//std::cout << "Checking ROM vs MEM" << std::endl;
 	
 	if (!file) 
 	{
@@ -99,7 +97,6 @@ bool chip8::checkRom(char* filename)
 		{
 			return 1;
 		}
-		//std::cout << std::hex << "PC: " << pc << "  ROM: " << static_cast<int>(tempRom) << "  Memory: " << static_cast<int>(memory[pc]) << std::endl;
 		++pc;
 	}
 		
@@ -110,7 +107,7 @@ bool chip8::checkRom(char* filename)
 	return 0;
 }
 
-bool chip8::emulateOneCycle(screen myScreen)
+bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 {
 
 	if (pc < 0 || pc >= 4096)
@@ -124,7 +121,6 @@ bool chip8::emulateOneCycle(screen myScreen)
 		return 1;
 	}
 
-	//std::cout << "Emulation Cycle: " << std::hex << pc << std::endl;
 	opcode = memory[pc] << 8 | memory[pc+1];	// grab next opcode
 	//pc += 2;									// increment pc by 2 (opcodes are 2 bytes)
 	
@@ -135,8 +131,11 @@ bool chip8::emulateOneCycle(screen myScreen)
 	uint8_t N = opcode & 0x000F;
 	uint8_t NN = opcode & 0x00FF;
 	uint16_t NNN = opcode & 0x0FFF;
-	
-	std::cout << "Opcode: 0x" << std::hex << static_cast<int>((opcode & 0xF000) >> 12) << static_cast<int>(X) << static_cast<int>(Y) << static_cast<int>(N) << " PC = " << pc << std::endl;
+
+	if (debugMode)
+	{
+		std::cout << "Opcode: 0x" << std::hex << static_cast<int>((opcode & 0xF000) >> 12) << static_cast<int>(X) << static_cast<int>(Y) << static_cast<int>(N) << " PC = " << pc << std::endl;
+	}
 	
 	switch(opcode & 0xF000)						// bit mask, narrow switch statement to only 0-F
 	{
@@ -152,7 +151,6 @@ bool chip8::emulateOneCycle(screen myScreen)
 					}
 					drawFlag = true;
 					pc += 2;
-					//std::cout << std::hex << pc << std::endl;
 					break;
 				}
 				case 0x00EE:
@@ -164,7 +162,7 @@ bool chip8::emulateOneCycle(screen myScreen)
 				}
 				default:
 				{
-					//std::cout << "Unknown Opcode: " << std::hex << opcode  << " pc = " << pc << std::endl;
+					std::cout << "Unknown Opcode: " << std::hex << opcode  << " pc = " << pc << std::endl;
 					pc += 2;
 					break;
 				}
