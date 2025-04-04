@@ -1,8 +1,10 @@
 # Images
 Space Invaders:
+
 ![Space Invaders](https://github.com/tdmorton/chip8emulator/blob/main/images/space_invaders.png "Space Invaders")
 
 Tetris:
+
 ![Tetris](https://github.com/tdmorton/chip8emulator/blob/main/images/tetris.png "Tetris")
 
 # Building
