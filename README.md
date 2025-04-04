@@ -1,8 +1,8 @@
 # Images
 
-![Space Invaders](https://github.com/tdmorton/chip8emulator/images/space_invaders.png "Space Invaders")
+![alt text](https://github.com/tdmorton/chip8emulator/images/space_invaders.png "Space Invaders")
 
-![Tetris](https://github.com/tdmorton/chip8emulator/images/tetris.png "Tetris")
+![alt text](https://github.com/tdmorton/chip8emulator/images/tetris.png "Tetris")
 
 # Building
 To build, run
