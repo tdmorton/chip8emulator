@@ -121,8 +121,8 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 		return 1;
 	}
 
-	opcode = memory[pc] << 8 | memory[pc+1];	// grab next opcode
-	//pc += 2;									// increment pc by 2 (opcodes are 2 bytes)
+	// grab next 2 byte opcode
+	opcode = memory[pc] << 8 | memory[pc+1];
 	
 	// use switch statement, function pointer implementation maybe later
 	
@@ -137,12 +137,14 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 		std::cout << "Opcode: 0x" << std::hex << static_cast<int>((opcode & 0xF000) >> 12) << static_cast<int>(X) << static_cast<int>(Y) << static_cast<int>(N) << " PC = " << pc << std::endl;
 	}
 	
-	switch(opcode & 0xF000)						// bit mask, narrow switch statement to only 0-F
+	// switch based on first hex number of opcode
+	switch(opcode & 0xF000)
 	{
 		case 0x0000:
 		{
 			switch(opcode)
 			{
+				// clear screen
 				case 0x00E0:
 				{
 					for (int i = 0; i < 64*32; ++i)
@@ -153,6 +155,7 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 					pc += 2;
 					break;
 				}
+				// return from subroutine
 				case 0x00EE:
 				{
 					--sp;
@@ -169,23 +172,26 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 			}
 			break;
 		}	
-		case 0x1000:													// 0x1NNN
+		// 0x1NNN Jump to NNN
+		case 0x1000:
 		{
-			pc = NNN;													// opcode = NNN
+			pc = NNN;
 			break;
 		}
-		case 0x2000:													// 0x2NNN
+		// 0x2NNN Call subroutine at NNN
+		case 0x2000:
 		{
 			stack[sp] = pc;
 			pc = NNN;
 			++sp;
 			break;
 		}
-		case 0x3000:													// 0x3XNN
+		// 0x3XNN Skip next instruction based on condition
+		case 0x3000:
 		{
-			if (V[X] == NN)			// if VX == NN
+			if (V[X] == NN)
 			{
-				pc += 4;												// skip next instruction
+				pc += 4;
 			}
 			else
 			{
@@ -193,23 +199,25 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 			}
 			break;
 		}
-		case 0x4000:													// 0x4XNN
+		// 0x4XNN Skip next instruction based on condition
+		case 0x4000:
 		{
 			if (V[X] == NN)
 			{
 				pc += 2;
-			}		// if VX != NN
+			}
 			else
 			{
-				pc += 4;												// skip next instruction
+				pc += 4;
 			}
 			break;
 		}
-		case 0x5000:													// 0x5XY0
+		// 0x5XNN Skip next instruction based on condition
+		case 0x5000:
 		{
-			if (V[X] == V[Y])	// if VX == VY
+			if (V[X] == V[Y])
 			{
-				pc += 4;												// skip next instruction
+				pc += 4;
 			}
 			else
 			{
@@ -217,47 +225,55 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 			}
 			break;
 		}
-		case 0x6000:													// 0x6XNN
+		// 0x6XNN Set VX to NN
+		case 0x6000:
 		{
-			V[X] = (opcode & 0x00FF);				// VX = NN
+			V[X] = (opcode & 0x00FF);
 			pc += 2;
 			break;
 		}
-		case 0x7000:													// 0x7XNN
+		// 0x7XNN Add NN to VX
+		case 0x7000:
 		{
-			V[X] += (opcode & 0x00FF);				// VX += NN (no carry flag set)
+			V[X] += (opcode & 0x00FF);	
 			pc += 2;
 			break;
 		}
+		// 0x8XY0-0x8XYE
 		case 0x8000:
 		{
-			switch (opcode & 0x000F)										// 0x8000-0x800E
+			switch (opcode & 0x000F)
 			{
-				case 0x0000:												// 0x8XY0
+				// 0x8XY0 VX = VY
+				case 0x0000:
 				{
-					V[X] = V[Y];	// VX = VY
+					V[X] = V[Y];
 					pc += 2;
 					break;
 				}
-				case 0x0001:												// 0x8XY1
+				// 0x8XY1 VX = VX OR VY
+				case 0x0001:
 				{
-					V[X] |= V[Y];	// VX |= VY
+					V[X] |= V[Y];
 					pc += 2;
 					break;
 				}
-				case 0x0002:												// 0x8XY2
+				// 0x8XY2 VX = VX AND VY
+				case 0x0002:
 				{
-					V[X] &= V[Y];	// VX &= VY
-					pc += 2;
-					break;
-				}				
-				case 0x0003:												// 0x8XY3
-				{
-					V[X] = V[X] ^ V[Y];	// VX ^= VY
+					V[X] &= V[Y];
 					pc += 2;
 					break;
 				}
-				case 0x0004:												// 0x8XY4
+				// 0x8XY3 VX = VX XOR VY	
+				case 0x0003:
+				{
+					V[X] ^= V[Y];
+					pc += 2;
+					break;
+				}
+				// 0x8XY4 VX = VX + VY (VF carry set)
+				case 0x0004:
 				{
 					uint8_t carry;
 					if ((V[X] + V[Y]) > 0xFF)
@@ -268,15 +284,16 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 					{
 						carry = 0;
 					}
-					V[X] += V[Y];								// VX += VY carry set
+					V[X] += V[Y];
 					V[0xF] = carry;
 					pc += 2;
 					break;
 				}
-				case 0x0005:												// 0x8XY5
+				// 0x8XY5 VX = VX - VY (VF carry set)
+				case 0x0005:
 				{
 					uint8_t carry;
-					if (V[X] >= V[Y])							// VF = !underflow
+					if (V[X] >= V[Y])
 					{
 						carry = 1;
 					}
@@ -284,24 +301,26 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 					{
 						carry = 0;
 					}
-					V[X] -= V[Y];								// VX -= VY carry set
+					V[X] -= V[Y];
 					V[0xF] = carry;
 					pc += 2;
 					break;
 				}
-				case 0x0006:												// 0x8XY6
+				// 0x8XY6 Bitshift VX right by 1 (VF carry set)
+				case 0x0006:
 				{
 					uint8_t carry;
-					carry = (V[X] & 0x01);										// VF = VX LSB
-					V[X] = V[X] >> 1;							// VX >>= 1
+					carry = (V[X] & 0x01);
+					V[X] = V[X] >> 1;
 					V[0xF] = carry;
 					pc += 2;
 					break;
 				}
-				case 0x0007:												// 0x8XY7
+				// 0x8XY7 VX = VY - VX (VF carry set)
+				case 0x0007:
 				{
 					uint8_t carry;
-					if (V[Y] >= V[X])							// VF = !underflow
+					if (V[Y] >= V[X])
 					{
 						carry = 1;
 					}
@@ -309,28 +328,36 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 					{
 						carry = 0;
 					}
-					V[X] = V[Y] - V[X];	// VX -= VY carry set
+					V[X] = V[Y] - V[X];
 					V[0xF] = carry;
 					pc += 2;
 					break;
 				}
-				case 0x000E:												// 0x8XYE
+				// 0x8XYE Bitshift VX left by 1 (VF carry set)
+				case 0x000E:
 				{
 					uint8_t carry;
-					carry = V[X] >> 7;										// VF = VX MSB
-					V[X] = V[X] << 1;							// VX <<= 1
+					carry = V[X] >> 7;
+					V[X] = V[X] << 1;
 					V[0xF] = carry;
+					pc += 2;
+					break;
+				}
+				default:
+				{
+					std::cout << "Unknown Opcode: " << std::hex << opcode  << " pc = " << pc << std::endl;
 					pc += 2;
 					break;
 				}
 			}
 			break;
 		}
-		case 0x9000:													// 0x9XY0
+		// 0x9XY0 Skip next instruction based on condition
+		case 0x9000:
 		{
 			if (V[X] != V[Y])
 			{
-				pc += 4;												// skip next instruction
+				pc += 4;
 			}
 			else
 			{
@@ -338,12 +365,14 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 			}
 			break;
 		}
+		// 0xANNN Set I to NNN
 		case 0xA000:
 		{
 			I = NNN;
 			pc += 2;
 			break;
 		}
+		// 0xBNNN Jump to NNN
 		case 0xB000:
 		{
 			//stack[sp] = pc;
@@ -352,15 +381,16 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 			pc += 2;
 			break;
 		}
+		// 0xCXNN Set VX to a random number with NN bitmask
 		case 0xC000:
 		{
 			V[X] = static_cast<uint8_t>(dist256(rng) & NN);
 			pc += 2;
 			break;
 		}
+		// 0xDXYN Draw sprite to screen
 		case 0xD000:
 		{
-			//drawSprite(V[X], V[Y], V[(opcode & 0x000F)]);
 			// x coordinate of sprite
 			int x = V[X];
 			// y coordinate of sprite
@@ -392,10 +422,12 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 			pc += 2;
 			break;
 		}
+		// 0xE??? series of opcodes
 		case 0xE000:
 		{
 			switch(opcode & 0x00F0)
 			{
+				// 0xEX9E Skip next instruction if key in VX is pressed
 				case 0x0090:
 				{
 					if (myScreen.keysPressed[V[X]])
@@ -408,6 +440,7 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 					}
 					break;
 				}
+				// 0xEX9E Skip next instruction if key in VX is not pressed
 				case 0x00A0:
 				{
 					if (!myScreen.keysPressed[V[X]])
@@ -427,6 +460,7 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 		{
 			switch(opcode & 0x000F)
 			{
+				// 0xFX33 Store BCD VX at I
 				case 0x0003:
 				{
 					memory[I] = static_cast<uint8_t>(V[X]/100); // hundreds place
@@ -439,12 +473,14 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 				{
 					switch(opcode & 0x00F0)
 					{
+						// 0xFX15 Set the delay timer to VX
 						case 0x0010:
 						{
 							delayTimer = V[X];
 							pc += 2;
 							break;
 						}
+						// 0xFX55 Store V0 - VX to memory starting at I
 						case 0x0050:
 						{
 							for (int i = 0; i <= X; ++i)
@@ -455,12 +491,14 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 							pc += 2;
 							break;
 						}
+						// 0xF065 Set V0 - VX from memory starting at I
 						case 0x0060:
 						{
 							for (int i = 0; i <= X; ++i)
 							{
 								V[i] = memory[I+i];
 							}
+							// I needs to be set to end of regs
 							I = I + X + 1;
 							pc += 2;
 							break;
@@ -468,24 +506,28 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 					}
 					break;
 				}
+				// FX07 Set VX to delay timer value
 				case 0x0007:
 				{
 					V[X] = delayTimer;
 					pc += 2;
 					break;
 				}
+				// FX18 Set sound delay to VX
 				case 0x0008:
 				{
 					soundTimer = V[X];
 					pc += 2;
 					break;
 				}
+				// FX29 Set I to Font location in VX
 				case 0x0009:
 				{
 					I = (V[X] * 5) + 0x50;
 					pc +=2;
 					break;
 				}
+				// FX0A Wait for key press and store in VX
 				case 0x000A:
 				{
 					bool keyPressed = false;
@@ -504,6 +546,7 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 					}
 					break;
 				}
+				// FX1E Add VX to I (VF carry set)
 				case 0x000E:
 				{
 					if (I+V[X] > 0x0FFF)
@@ -514,12 +557,18 @@ bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
 					pc += 2;
 					break;
 				}
+				default:
+				{
+					std::cout << "Unknown Opcode: " << std::hex << opcode << std::endl;
+					break;
+				}
 			}
 			break;
 		}
 		default:
 		{
 			std::cout << "Unknown Opcode: " << std::hex << opcode << std::endl;
+			pc += 2;
 			break;
 		}
 	}

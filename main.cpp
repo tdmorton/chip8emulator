@@ -12,7 +12,7 @@ void printHelp();
 
 int main(int argc, char** argv)
 {
-
+	// in opcodes/second, not exactly a framerate
 	int executionSpeed = 360;
 	
 	if (argc < 2)
