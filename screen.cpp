@@ -1,10 +1,8 @@
 #include "screen.hpp"
 
-bool screen::init()
+screen::screen()
 {
-	//Initialization flag
 	bool success = true;
-
 
 	uint8_t tempKeys[16] = 
 	{
@@ -66,11 +64,9 @@ bool screen::init()
 			}
 		}
 	}
-
-	return success;
 }
 
-void screen::close()
+screen::~screen()
 {
 	//Free loaded image
 	SDL_DestroyTexture( gTexture );

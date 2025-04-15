@@ -13,30 +13,30 @@
 class screen
 {
 	public:
-	const int SCREEN_WIDTH = 640;
-	const int SCREEN_HEIGHT = 320;	
-	
-
-	//Pixel Buffer (SDL expects 32 bit integers for ARGB8888)
-	uint32_t pixels[2048];			
 
 	//map of all the keys to use
 	uint8_t chipKeys[16] ;
 
 	//map of if that key is currently pressed
 	int keysPressed[16];
-	
-	//Starts up SDL and creates window
-	bool init();
-	
-	//Frees media and shuts down SDL
-	void close();
-	
+
 	//Draws the contents of pixelBuffer onto the screen
 	bool drawScreen(uint8_t * pixelBuffer);
 
 	//Reads the current key press events
 	bool readKeys(bool debugMode);
+
+	screen();
+	~screen();
+
+	private:
+
+	const int SCREEN_WIDTH = 640;
+	const int SCREEN_HEIGHT = 320;	
+	
+
+	//Pixel Buffer (SDL expects 32 bit integers for ARGB8888)
+	uint32_t pixels[2048];			
 	
 	//The window we'll be rendering to
 	SDL_Window* gWindow = NULL;

@@ -55,10 +55,6 @@ int main(int argc, char** argv)
 
 	chip8 ch8;
 	
-	bool ch8Init = ch8.init();
-
-	bool screenInit = myScreen.init();
-	
 	bool fileLoaded = ch8.loadRom(filename);
 	
 	bool memBad = ch8.checkRom(filename);

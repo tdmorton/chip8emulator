@@ -9,9 +9,8 @@ std::random_device dev;
 std::mt19937 rng(dev());
 std::uniform_int_distribution<std::mt19937::result_type> dist256(0,255);
 
-bool chip8::init()
+chip8::chip8()
 {
-	
 	sp = 0;
 	pc = 0x200;
 	I = 0;
@@ -47,9 +46,8 @@ bool chip8::init()
 		memory[i] = fonts[i-0x050];
 	}
 	
-	return 0;
-	
 }
+chip8::~chip8(){}
 
 bool chip8::loadRom(char* filename)
 {
@@ -107,7 +105,7 @@ bool chip8::checkRom(char* filename)
 	return 0;
 }
 
-bool chip8::emulateOneCycle(screen myScreen, bool debugMode)
+bool chip8::emulateOneCycle(screen& myScreen, bool debugMode)
 {
 
 	if (pc < 0 || pc >= 4096)
